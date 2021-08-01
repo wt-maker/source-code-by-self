@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>投资小游戏</title>
+  <script>
+    let data = null;
+    function getInvestmentInfo() {
+      // 请求地址
+      const url = 'http://localhost:3030/getInvestmentInfo';
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', url);
+      xhr.responseType = 'json';
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          data = xhr.response.data;
+          document.getElementById('money').innerHTML = '资金：' + data.money;
+          document.getElementById('environment').innerHTML = '经济环境：' + data.environment;
+          document.getElementById('bg_picture').src = data.bg_picture;
+          document.getElementById('content').innerHTML = data.content;
+          const options = data.options;
+          let optionList = '';
+          options.forEach(option => {
+            optionList += `<button onClick="sendRequest('${option}');">${option}</button>`
+          });
+
+          document.getElementById('option-root').innerHTML = optionList;
+        }
+      }
+      xhr.send();
+    }
+
+    function sendRequest(value) {
+      const url = 'http://localhost:3030/sendInvestmentInfo';
+      const requestBody = {
+        ...data,
+        choice: value
+      };
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', url);
+      xhr.responseType = 'json';
+      xhr.setRequestHeader('content-type', 'application/json');
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          data = xhr.response.data;
+          document.getElementById('money').innerHTML = '资金：' + data.money;
+          document.getElementById('environment').innerHTML = '经济环境：' + data.environment;
+          document.getElementById('bg_picture').src = data.bg_picture;
+          document.getElementById('content').innerHTML = data.content;
+          const options = data.options;
+          let optionList = '';
+          options.forEach(option => {
+            optionList += `<button onClick="sendRequest('${option}');">${option}</button>`
+          });
+
+          document.getElementById('option-root').innerHTML = optionList;
+        }
+      }
+      xhr.send(JSON.stringify(requestBody));
+    }
+
+
+  </script>
+  <style>
+    .investment-root {
+      width: 300px;
+      height: 500px;
+      background-color: rgb(146, 235, 183);
+      margin: 30px auto;
+      border-radius: 15px;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    #bg_picture {
+      margin-top: 30px;
+      width: 300px;
+      height: 140px;
+    }
+
+    #content {
+      margin-top: 20px;
+      margin-bottom: 20px;
+      word-wrap: break-word;
+      word-break: break-all;
+      overflow: hidden;
+    }
+
+    #option-root button {
+      display: block;
+      width: 200px;
+      height: 30px;
+      margin: 0 auto;
+      border-radius: 15px;
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+
+<body onload="getInvestmentInfo();">
+  <div class="investment-root">
+    <div class="game-root">
+      <div class="header">
+        <span id="money">资金：</span>
+        <span id="environment">经济环境：</span>
+      </div>
+      <div class="descrpition-root">
+        <div class="img-wrap">
+          <img id="bg_picture" src="" />
+        </div>
+        <div id="content">
+
+        </div>
+      </div>
+      <div id="option-root">
+
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
